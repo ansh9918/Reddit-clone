@@ -1,0 +1,183 @@
+"use client";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog";
+import { useUser } from "@clerk/nextjs";
+import { ImageIcon, Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef, useState, useTransition } from "react";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import Image from "next/image";
+import { Button } from "../ui/button";
+
+const CreateCommunityButton = () => {
+    const { user } = useUser();
+    const [errorMessage, setErrorMessage] = useState("");
+    const [open, setOpen] = useState(false);
+    const [name, setName] = useState("");
+    const [slug, setSlug] = useState("");
+    const [description, setDescription] = useState("");
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [isPending, startTransition] = useTransition();
+    const router = useRouter();
+
+    const handleNameChange = () => {};
+
+    const removeImage = () => {};
+
+    const handleImageChange = () => {};
+
+    const handleCreateCommunity = () => {};
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger
+                className="w-full p-2 pl-5 flex items-center rounded-md cursor-pointer bg-black text-white hover:bg-black transition-all duration-200 disabled:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!user}>
+                <Plus className="h-4 w-4 mr-2" />
+                {user ? "Create a community" : "Sign in to create a community"}
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Create a community</DialogTitle>
+                    <DialogDescription>
+                        Create a community/subreddit to share ideas and get
+                        feedback.
+                    </DialogDescription>
+                    <form
+                        className="space-y-4 mt-2"
+                        onSubmit={handleCreateCommunity}>
+                        {errorMessage && (
+                            <div className="text-red-500 text-sm">
+                                {errorMessage}
+                            </div>
+                        )}
+                        <div className="space-y-2">
+                            <label
+                                htmlFor="name"
+                                className="text-sm font-medium">
+                                Community name
+                            </label>
+                            <Input
+                                id="name"
+                                name="name"
+                                placeholder="My Community"
+                                className="w-full focus:ring-2 focus:ring-blue-500"
+                                value={name}
+                                onChange={handleNameChange}
+                                required
+                                minLength={3}
+                                maxLength={21}
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <label
+                                htmlFor="slug"
+                                className="text-sm font-medium">
+                                Community Slug (URL)
+                            </label>
+                            <Input
+                                id="slug"
+                                name="slug"
+                                placeholder="My Community"
+                                className="w-full focus:ring-2 focus:ring-blue-500"
+                                value={slug}
+                                onChange={(e) => setSlug(e.target.value)}
+                                required
+                                minLength={3}
+                                maxLength={21}
+                            />
+                            <p className="text-xs text-gray-500">
+                                This will be used in the URL:
+                                reddish.com/community/
+                                {slug || "community-slug"}
+                            </p>
+                        </div>
+                        <div className="space-y-2">
+                            <label
+                                htmlFor="description"
+                                className="text-sm font-medium">
+                                Description
+                            </label>
+                            <Textarea
+                                id="description"
+                                name="description"
+                                placeholder="What is this community about?"
+                                className="w-full focus:ring-2 focus:ring-blue-500"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                rows={3}
+                            />
+                        </div>
+
+                        {/* Image */}
+                        <div className="space-y-2">
+                            <label htmlFor="" className="text-sm font-medium">
+                                Community Image (optional)
+                            </label>
+
+                            {imagePreview ? (
+                                <div className="relative w-24 h-24 mx-auto">
+                                    <Image
+                                        src={imagePreview}
+                                        alt="Communinty preview"
+                                        fill
+                                        className="object-cover rounded-full"
+                                    />
+                                    <Button
+                                        type="button"
+                                        onClick={removeImage}
+                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                                        x
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-center w-full">
+                                    <label
+                                        htmlFor="community-image"
+                                        className="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                                        <div className="flex flex-col items-center justify-center">
+                                            <ImageIcon className="w-6 h-6 mb-2 text-gray-400" />
+                                            <p className="text-xs text-gray-500">
+                                                Click to upload an image
+                                            </p>
+                                        </div>
+                                        <input
+                                            id="community-image"
+                                            name="community-image"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            ref={fileInputRef}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                </div>
+                            )}
+                        </div>
+                        <Button
+                            type="submit"
+                            className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isPending || !user}>
+                            {isPending
+                                ? "Creating..."
+                                : user
+                                  ? "Create Community"
+                                  : "Sign in to create community"}
+                        </Button>
+                    </form>
+                </DialogHeader>
+            </DialogContent>
+        </Dialog>
+    );
+};
+
+export default CreateCommunityButton;
