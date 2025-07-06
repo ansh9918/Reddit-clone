@@ -7,6 +7,7 @@ import { ChevronLeftIcon, MenuIcon } from "lucide-react";
 import Image from "next/image";
 import ReddishLogo from "@/images/Reddish Full.png";
 import ReddishLogoOnly from "@/images/Reddish Logo Only.png";
+import CreatePost from "../post/CreatePost";
 
 const Header = () => {
     const { toggleSidebar, isMobile, open } = useSidebar();
@@ -39,7 +40,8 @@ const Header = () => {
                     </div>
                 )}
             </div>
-            <div>
+            <div className="flex items-center gap-5">
+                <CreatePost />
                 <SignedIn>
                     <UserButton />
                 </SignedIn>

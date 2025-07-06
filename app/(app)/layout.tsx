@@ -5,6 +5,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import Header from "@/components/header/Header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+import { SanityLive } from "@/sanity/lib/live";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -27,7 +28,8 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <ClerkProvider>
+        <ClerkProvider
+            publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
             <html lang="en">
                 <body
                     className={`${geistSans.variable} ${geistMono.variable} antialiased scroll-smooth`}>
@@ -38,6 +40,7 @@ export default function RootLayout({
                             {children}
                         </SidebarInset>
                     </SidebarProvider>
+                    <SanityLive />
                 </body>
             </html>
         </ClerkProvider>

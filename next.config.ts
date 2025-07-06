@@ -5,14 +5,21 @@ const nextConfig: NextConfig = {
     images: {
         remotePatterns: [
             {
-                hostname: "cdn.sanity.io",
                 protocol: "https",
+                hostname: "cdn.sanity.io",
+                pathname: "/**",
             },
             {
-                hostname: "img.clerk.com",
                 protocol: "https",
+                hostname: "img.clerk.com",
+                pathname: "/**",
             },
         ],
+    },
+    experimental: {
+        serverActions: {
+            bodySizeLimit: "7mb",
+        },
     },
 };
 

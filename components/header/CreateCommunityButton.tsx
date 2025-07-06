@@ -15,6 +15,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import Image from "next/image";
 import { Button } from "../ui/button";
+import { createCommunity } from "@/action/createCommunity";
 
 const CreateCommunityButton = () => {
     const { user } = useUser();
@@ -29,13 +30,111 @@ const CreateCommunityButton = () => {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
 
-    const handleNameChange = () => {};
+    const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setName(value);
+        if (!slug || slug === generateSlug(name)) {
+            setSlug(generateSlug(value));
+        }
+    };
 
-    const removeImage = () => {};
+    const generateSlug = (text: string) => {
+        return text
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, "")
+            .slice(0, 21);
+    };
 
-    const handleImageChange = () => {};
+    const removeImage = () => {
+        setImagePreview(null);
+        setImageFile(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
 
-    const handleCreateCommunity = () => {};
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setImageFile(file);
+            const reader = new FileReader();
+            reader.onload = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const resetForm = () => {
+        setName("");
+        setSlug("");
+        setDescription("");
+        setErrorMessage("");
+        setImagePreview(null);
+        setImageFile(null);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
+    const handleCreateCommunity = async (
+        e: React.FormEvent<HTMLFormElement>,
+    ) => {
+        e.preventDefault();
+
+        if (!name.trim()) {
+            setErrorMessage("Community name is required");
+            return;
+        }
+
+        if (!slug.trim()) {
+            setErrorMessage("Community slug is required");
+            return;
+        }
+
+        setErrorMessage("");
+
+        startTransition(async () => {
+            try {
+                let imageBase64: string | null = null;
+                let fileName: string | null = null;
+                let fileType: string | null = null;
+
+                if (imageFile) {
+                    const reader = new FileReader();
+                    imageBase64 = await new Promise<string>((resolve) => {
+                        reader.onload = () => resolve(reader.result as string);
+                        reader.readAsDataURL(imageFile);
+                    });
+                    fileName = imageFile.name;
+                    fileType = imageFile.type;
+                }
+
+                const result = await createCommunity(
+                    name.trim(),
+                    imageBase64,
+                    fileName,
+                    fileType,
+                    slug.trim(),
+                    description.trim() || undefined,
+                );
+
+                console.log("Community created:", result);
+
+                if ("error" in result && result.error) {
+                    setErrorMessage(result.error);
+                } else if ("subreddit" in result && result.subreddit) {
+                    setOpen(false);
+                    resetForm();
+                    router.push(`/community/${result.subreddit.slug?.current}`);
+                }
+            } catch (err) {
+                console.error("Failed to create community", err);
+                setErrorMessage("Failed to create community");
+            }
+        });
+    };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
