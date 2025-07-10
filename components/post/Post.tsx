@@ -1,4 +1,7 @@
-import { GetAllPostsQueryResult } from "@/sanity.types";
+import {
+    GetAllPostsQueryResult,
+    GetPostsForSubredditQueryResult,
+} from "@/sanity.types";
 import { getPostComments } from "@/sanity/lib/comments/comments";
 import { getPostVotes, getUserPostVoteStatus } from "@/sanity/lib/vote/vote";
 import PostVoteButtons from "./PostVoteButtons";
@@ -12,7 +15,9 @@ import ReportButton from "../ReportButton";
 import DeleteButton from "../DeleteButton";
 
 interface PostProps {
-    post: GetAllPostsQueryResult[number];
+    post:
+        | GetAllPostsQueryResult[number]
+        | GetPostsForSubredditQueryResult[number];
     userId: string | null;
 }
 

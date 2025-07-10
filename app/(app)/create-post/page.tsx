@@ -14,6 +14,8 @@ async function CreatePostPage({
     const subreddits = await getSubReddits();
     // console.log(subreddits);
 
+    if (!subreddits) return null;
+
     if (subreddit) {
         return (
             <>
